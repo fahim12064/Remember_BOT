@@ -5,7 +5,7 @@ import time
 
 # --- Configuration ---
 USER_IDS_FILE = "user_ids.json"
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") # secrets.TELEGRAM_BOT_TOKEN এর সাথে নাম মিলানো হয়েছে
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 if not TELEGRAM_BOT_TOKEN:
     raise ValueError("টোকেন পাওয়া যায়নি! GitHub Secrets-এ TELEGRAM_BOT_TOKEN সেট করুন।")
@@ -128,4 +128,3 @@ if __name__ == "__main__":
         # ধাপ ৩: ২ মিনিট অপেক্ষা করা
         print("\n--- Cycle complete. Waiting for 2 minutes... ---")
         time.sleep(120)
-

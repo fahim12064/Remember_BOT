@@ -1,15 +1,21 @@
-# Workflow-এর নাম
+# Workflow-এর একটি অর্থপূর্ণ নাম
 name: Run Study Buddy Bot
 
 # কখন এই Workflow চলবে তার নিয়ম
 on:
-  # GitHub-এ কোড push করলে বা merge করলে এটি একবার চলবে (টেস্টিংয়ের জন্য)
+  # ১. GitHub-এ কোড push করলে (শুধুমাত্র main ব্রাঞ্চে)
   push:
     branches:
-      - main # আপনার মূল ব্রাঞ্চের নাম main বা master হতে পারে
+      - main
 
-  # এই অংশটি গুরুত্বপূর্ণ: Workflow-টিকে সব সময় চালু রাখার জন্য
+  # ২. ম্যানুয়ালি চালানোর জন্য (Actions ট্যাব থেকে)
+  # এটিই আপনার বটকে ২৪/৭ চালানোর জন্য ব্যবহার করতে হবে
   workflow_dispatch:
+
+# এই Job-কে ফাইল লেখার (write) অনুমতি দেওয়া হচ্ছে
+# যাতে এটি user_ids.json ফাইল কমিট ও পুশ করতে পারে
+permissions:
+  contents: write
 
 # Workflow-এর কাজগুলো (Jobs)
 jobs:
@@ -20,26 +26,38 @@ jobs:
     # Job-এর ধাপগুলো
     steps:
       # ধাপ ১: Repository-র কোড ডাউনলোড করা
-      - name: Check out repository code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       # ধাপ ২: Python 3.10 সেটআপ করা
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # আপনার পছন্দের পাইথন ভার্সন
+          python-version: '3.10'
 
-      # ধাপ ৩: প্রয়োজনীয় লাইব্রেরি ইনস্টল করা
+      # ধাপ ৩: প্রয়োজনীয় পাইথন লাইব্রেরি ইনস্টল করা
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
 
       # ধাপ ৪: বটটি চালানো (মূল কাজ)
-      # এটি একটি অসীম লুপে বটটিকে চালাবে
+      # timeout-minutes: 350 ব্যবহার করা হয়েছে যাতে job-টি প্রায় ৬ ঘণ্টা চলে
       - name: Run the Telegram bot
+        timeout-minutes: 350
         env:
           # GitHub Secret থেকে টোকেন এখানে আনা হচ্ছে
-          YOUR_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python main.py
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python main.py # <-- আপনার পাইথন ফাইলের নাম main.py হলে এটি ঠিক আছে
+
+      # ধাপ ৫: পরিবর্তিত ফাইল কমিট ও পুশ করা
+      # এই ধাপটি তখনই কাজ করবে যখন বটটি কোনো কারণে বন্ধ হয়ে যাবে (যেমন ৬ ঘণ্টা পর)
+      # এটি user_ids.json এবং last_update_id.txt ফাইল কমিট করবে
+      - name: Commit and push updated data files
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add user_ids.json last_update_id.txt
+          # যদি কোনো পরিবর্তন থাকে, তবেই কমিট ও পুশ করবে
+          git diff --staged --quiet || git commit -m "CI: Update user IDs and last update ID" && git push
 
