@@ -5,8 +5,10 @@ import time
 
 # --- Configuration ---
 USER_IDS_FILE = "user_ids.json"
-# আপনার টেলিগ্রাম বটের টোকেন এখানে দিন অথবা এনভায়রনমেন্ট ভ্যারিয়েবল হিসেবে সেট করুন
-TELEGRAM_BOT_TOKEN = os.getenv("YOUR_TELEGRAM_BOT_TOKEN", "এখানে_আপনার_টোকেন_দিন")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") # secrets.TELEGRAM_BOT_TOKEN এর সাথে নাম মিলানো হয়েছে
+
+if not TELEGRAM_BOT_TOKEN:
+    raise ValueError("টোকেন পাওয়া যায়নি! GitHub Secrets-এ TELEGRAM_BOT_TOKEN সেট করুন।")
 
 
 # --- Utility Functions ---
