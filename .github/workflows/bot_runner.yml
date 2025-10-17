@@ -48,7 +48,7 @@ jobs:
         env:
           # GitHub Secret থেকে টোকেন এখানে আনা হচ্ছে
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python main.py # <-- আপনার পাইথন ফাইলের নাম main.py হলে এটি ঠিক আছে
+        run: python -u main.py # <-- আপনার পাইথন ফাইলের নাম main.py হলে এটি ঠিক আছে
 
       # ধাপ ৫: পরিবর্তিত ফাইল কমিট ও পুশ করা
       # এই ধাপটি তখনই কাজ করবে যখন বটটি কোনো কারণে বন্ধ হয়ে যাবে (যেমন ৬ ঘণ্টা পর)
