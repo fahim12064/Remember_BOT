@@ -1,0 +1,45 @@
+# Workflow-এর নাম
+name: Run Study Buddy Bot
+
+# কখন এই Workflow চলবে তার নিয়ম
+on:
+  # GitHub-এ কোড push করলে বা merge করলে এটি একবার চলবে (টেস্টিংয়ের জন্য)
+  push:
+    branches:
+      - main # আপনার মূল ব্রাঞ্চের নাম main বা master হতে পারে
+
+  # এই অংশটি গুরুত্বপূর্ণ: Workflow-টিকে সব সময় চালু রাখার জন্য
+  workflow_dispatch:
+
+# Workflow-এর কাজগুলো (Jobs)
+jobs:
+  run-bot:
+    # কোন অপারেটিং সিস্টেমে চলবে
+    runs-on: ubuntu-latest
+
+    # Job-এর ধাপগুলো
+    steps:
+      # ধাপ ১: Repository-র কোড ডাউনলোড করা
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      # ধাপ ২: Python 3.10 সেটআপ করা
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # আপনার পছন্দের পাইথন ভার্সন
+
+      # ধাপ ৩: প্রয়োজনীয় লাইব্রেরি ইনস্টল করা
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      # ধাপ ৪: বটটি চালানো (মূল কাজ)
+      # এটি একটি অসীম লুপে বটটিকে চালাবে
+      - name: Run the Telegram bot
+        env:
+          # GitHub Secret থেকে টোকেন এখানে আনা হচ্ছে
+          YOUR_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python main.py
+
